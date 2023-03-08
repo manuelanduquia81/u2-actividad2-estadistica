@@ -5,29 +5,54 @@ date: "2023-03-06"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+
+### **PROBLEMA 1 - Teorema del Límite Central**
+
+**A.** Genere una población de N=1000 (Lote), donde el porcentaje de individuos (supongamos plantas) enfermas sea del 50%.
+
+```{r, echo=FALSE}
+set.seed(123) # fijamos una semilla para reproducibilidad
+N <- 1000
+plantas_enfermas <- 0.5
+poblacion <- ifelse(pnorm(rnorm(N, mean = 0, sd = 1)) > 1 - plantas_enfermas, 1, 0)
+
+
+# Porcentaje plantas enfermas
+porcentaje_enfermas <- mean(poblacion)
+
+# Mostrando resultados
+cat(sprintf("El porcentaje de plantas enfermas en la población es %.2f%%.", porcentaje_enfermas * 100))
+
 ```
 
-## R Markdown
+**B.** Función para obtener una muestra aleatoria población y calcular el estimador de la muestra p
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r, echo=FALSE}
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+
 ```
 
-## Including Plots
+**C.** Repetir escenario n = 500
 
-You can also embed plots, for example:
+```{r, echo=FALSE}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+**D.** Repetir con tamaños de muestra n=5-200 y comparar resultados (gráfico normalidad)
+
+```{r, echo=FALSE}
 
 
-# **PROBLEMA 1 - Teorema del Límite Central**
+
+```
+
+**E.** Repetir simulación con lotes de 10% plantas enfermas
+
+```{r, echo=FALSE}
+
+
+
+```
