@@ -1,58 +1,178 @@
 ---
-title: "actividad2-problema1"
-author: "Manuel Anduquia"
-date: "2023-03-06"
+title: "Actividad2 Problema1"
+author: "Paula Gonzalez & Manuel Anduquia - Grupo 8"
+date: "2023-03-13"
 output: html_document
 ---
 
 
 ### **PROBLEMA 1 - Teorema del Límite Central**
 
-**A.** Genere una población de N=1000 (Lote), donde el porcentaje de individuos (supongamos plantas) enfermas sea del 50%.
+**A.** Escenario 1 con población de N=1000, donde el porcentaje de individuos (plantas enfermas) sea del 50%.  
+**B.** Función para obtener una muestra aleatoria de la población y calcular el estimador de la muestra p.  
+**C.** Escenario2, repetir escenario1 N=500 y muestra=500. ¿Qué tan simétricos/sesgados son los resultados? ¿Variabilidad?
 
-```{r, echo=FALSE}
-set.seed(123) # fijamos una semilla para reproducibilidad
+```{r escenario1-2, include=TRUE}
+# Generar población de N=1000 con un 50% de plantas enfermas
+set.seed(123) # para replicabilidad de los resultados
+poblacion1 <- rbinom(n = 1000, size = 1, prob = 0.5)
+
+# Función para obtener una muestra aleatoria de tamaño n de la población
+muestra_aleatoria <- function(poblacion, n){
+  muestra <- sample(poblacion, size = n, replace = FALSE)
+  return(muestra)
+}
+
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n1 <- 100 # tamaño de muestra 1
+muestra1 <- muestra_aleatoria(poblacion1, n1)
+p_estimado1 <- mean(muestra1)
+p_estimado1
+
+# Generar población de N=500 con un 50% de plantas enfermas
+set.seed(456) # para replicabilidad de los resultados
+poblacion2 <- rbinom(n = 500, size = 1, prob = 0.5)
+
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n2 <- 500 # tamaño de muestra 2
+muestra2 <- muestra_aleatoria(poblacion2, n2)
+p_estimado2 <- mean(muestra2)
+p_estimado2
+
+# Graficar histogramas de los valores estimados - Sesgos
+par(mfrow=c(1,2)) # para mostrar dos gráficos en una misma línea
+hist(p_estimado1, main = "Histograma p_estimado1", xlab = "Proporción muestral")
+hist(p_estimado2, main = "Histograma p_estimado2", xlab = "Proporción muestral")
+
+# Calcular la desviación estándar de los valores estimados de proporción muestral
+sd_estimado1 <- sd(p_estimado1)
+sd_estimado2 <- sd(p_estimado2)
+
+# Imprimir los resultados
+cat("Desviación estándar de p_estimado1:", sd_estimado1, "\n")
+cat("Desviación estándar de p_estimado2:", sd_estimado2, "\n")
+``` 
+
+
+**D.** Repetir con tamaños de muestra n=5-200 y comparar resultados (gráfico normalidad).  
+```{r grafico-normalidad, iclude=TRUE}
+# Definir tamaño de la población y porcentaje de plantas enfermas
 N <- 1000
-plantas_enfermas <- 0.5
-poblacion <- ifelse(pnorm(rnorm(N, mean = 0, sd = 1)) > 1 - plantas_enfermas, 1, 0)
+p <- 0.5
 
+# Generar población
+poblacion <- rep(c("Sana", "Enferma"), each = round(N * p))
 
-# Porcentaje plantas enfermas
-porcentaje_enfermas <- mean(poblacion)
+# Definir tamaños de muestra a simular
+n <- c(5, 10, 15, 20, 30, 50, 60, 100, 200, 500)
 
-# Mostrando resultados
-cat(sprintf("El porcentaje de plantas enfermas en la población es %.2f%%.", porcentaje_enfermas * 100))
+# Crear vectores para almacenar los resultados
+p_estimado <- numeric(length(n))
+p_valor <- numeric(length(n))
 
+# Simular muestras y aplicar prueba de normalidad y QQ-plot
+for (i in seq_along(n)) {
+  
+  # Generar muestra aleatoria
+  muestra <- sample(poblacion, size = n[i], replace = FALSE)
+  
+  # Calcular proporción muestral
+  p_estimado[i] <- mean(muestra == "Enferma")
+  
+  # Aplicar prueba de normalidad de Shapiro-Wilk
+  p_valor[i] <- shapiro.test(p_estimado)$p.value
+  
+  # Graficar QQ-plot
+  qqnorm(p_estimado[i], main = paste0("n=", n[i]))
+  qqline(p_estimado[i])
+}
+
+# Imprimir resultados de la prueba de normalidad
+cat("p-valor de la prueba de normalidad:\n")
+print(p_valor)
+```
+**E.1** Repetir simulación con lotes de 10% plantas enfermas.  
+```{r, include=TRUE}
+# Generar población de N=1000 con un 10% de plantas enfermas
+set.seed(123) # para replicabilidad de los resultados
+poblacion1a <- rbinom(n = 1000, size = 1, prob = 0.1)
+
+# Función para obtener una muestra aleatoria de tamaño n de la población
+muestra_aleatoria <- function(poblacion, n){
+  muestra <- sample(poblacion, size = n, replace = FALSE)
+  return(muestra)
+}
+
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n1 <- 100 # tamaño de muestra 1
+muestra1a <- muestra_aleatoria(poblacion1a, n1)
+p_estimado1a <- mean(muestra1a)
+p_estimado1a
+
+# Generar población de N=500 con un 50% de plantas enfermas
+set.seed(456) # para replicabilidad de los resultados
+poblacion2a <- rbinom(n = 500, size = 1, prob = 0.1)
+
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n2 <- 500 # tamaño de muestra 2
+muestra2a <- muestra_aleatoria(poblacion2, n2)
+p_estimado2a <- mean(muestra2a)
+p_estimado2a
+
+# Graficar histogramas de los valores estimados - Sesgos
+par(mfrow=c(1,2)) # para mostrar dos gráficos en una misma línea
+hist(p_estimado1a, main = "Histograma p_estimado1a", xlab = "Proporción muestral")
+hist(p_estimado2a, main = "Histograma p_estimado2a", xlab = "Proporción muestral")
+
+# Calcular la desviación estándar de los valores estimados de proporción muestral
+sd_estimado1 <- sd(p_estimado1a)
+sd_estimado2 <- sd(p_estimado2a)
+
+# Imprimir los resultados
+cat("Desviación estándar de p_estimado1a:", sd_estimado1, "\n")
+cat("Desviación estándar de p_estimado2a:", sd_estimado2, "\n")
 ```
 
-**B.** Función para obtener una muestra aleatoria población y calcular el estimador de la muestra p
-
-```{r, echo=FALSE}
 
 
+**E.2** Repetir simulación con lotes de 90% plantas enfermas.  
+```{r, include=TRUE}
+# Generar población de N=1000 con un 90% de plantas enfermas
+set.seed(123) # para replicabilidad de los resultados
+poblacion1b <- rbinom(n = 1000, size = 1, prob = 0.9)
 
-```
+# Función para obtener una muestra aleatoria de tamaño n de la población
+muestra_aleatoria <- function(poblacion, n){
+  muestra <- sample(poblacion, size = n, replace = FALSE)
+  return(muestra)
+}
 
-**C.** Repetir escenario n = 500
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n1 <- 100 # tamaño de muestra 1
+muestra1b <- muestra_aleatoria(poblacion1b, n1)
+p_estimado1b <- mean(muestra1b)
+p_estimado1b
 
-```{r, echo=FALSE}
+# Generar población de N=500 con un 50% de plantas enfermas
+set.seed(456) # para replicabilidad de los resultados
+poblacion2b <- rbinom(n = 500, size = 1, prob = 0.1)
 
+# Calcular el estimador de proporción muestral p^ para tamaño de muestra dado n
+n2 <- 500 # tamaño de muestra 2
+muestra2b <- muestra_aleatoria(poblacion2, n2)
+p_estimado2b <- mean(muestra2b)
+p_estimado2b
 
+# Graficar histogramas de los valores estimados - Sesgos
+par(mfrow=c(1,2)) # para mostrar dos gráficos en una misma línea
+hist(p_estimado1b, main = "Histograma p_estimado1b", xlab = "Proporción muestral")
+hist(p_estimado2b, main = "Histograma p_estimado2b", xlab = "Proporción muestral")
 
-```
+# Calcular la desviación estándar de los valores estimados de proporción muestral
+sd_estimado1 <- sd(p_estimado1b)
+sd_estimado2 <- sd(p_estimado2b)
 
-**D.** Repetir con tamaños de muestra n=5-200 y comparar resultados (gráfico normalidad)
-
-```{r, echo=FALSE}
-
-
-
-```
-
-**E.** Repetir simulación con lotes de 10% plantas enfermas
-
-```{r, echo=FALSE}
-
-
-
+# Imprimir los resultados
+cat("Desviación estándar de p_estimado1a:", sd_estimado1, "\n")
+cat("Desviación estándar de p_estimado2a:", sd_estimado2, "\n")
 ```
